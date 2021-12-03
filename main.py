@@ -4,31 +4,49 @@ from time import sleep
 import os, struct, array
 from fcntl import ioctl
 import _thread
+import atexit
 
+def exit_handler():
+    print('My application is ending!')
+
+atexit.register(exit_handler)
 
 ############# FUNCTION DEFINITIONS ###############
 def right_monitor():
     while axis_states['right'] > -1:
+        if check_left_stick() or check_right_stick():
+            while(check_left_stick() or check_right_stick()):
+                sleep(0.01)
+
+            motor1.forward()
+            motor2.forward()
         print("forward")
 
 def left_monitor():
     while axis_states['brake'] > -1:
+        if check_left_stick() or check_right_stick():
+            while(check_left_stick() or check_right_stick()):
+                sleep(0.1)
+
+            motor1.backwards()
+            motor2.backwards()
         print("backwards")
 
 def right_stick_monitor():
     while check_right_stick():
-        print("right wheel")
+        five = 0
+        #print("right wheel")
 
 def left_stick_monitor():
     while check_left_stick():
-        print("left wheel")
+        five = 0
+        #print("left wheel")
 
 def check_right_stick():
-    return (axis_states['z'] > 0.5 or axis_states['z'] < -0.5) or (axis_states['rz'] > 0.5 or axis_states['rz'] < -0.5)
+    return(axis_states['hat0x'] > 0.05)
 
 def check_left_stick():
-    return (axis_states['x'] > 0.5 or axis_states['x'] < -0.5) or (axis_states['y'] > 0.5 or axis_states['y'] < -0.5)
-
+    return(axis_states['hat0x'] < -0.05)
 
 ############# SET UP CONTROLLER BINDINGS ###############
 
@@ -169,6 +187,7 @@ right_down = False
 left_down = False
 stick_right_active = False
 stick_left_active = False
+halt_for_turn = False
 
 # TODO: turning - one wheel back one forward
 while True:
@@ -179,14 +198,24 @@ while True:
         if type & 0x01:
             button = button_map[number]
             print(button + " clicked")
-            if button == 'tr' and value:
-                sleep(.5)
+            button_states[button] = value
+            if value:
+                if not down:
+                    print("%s pressed" % (button))
+                    down = True
+            else:
+                print("%s released" % (button))
+                down = False
 
         if type & 0x02:
             axis = axis_map[number]
             if axis:
                 cur_axis_value = value / 32767.0
                 axis_states[axis] = cur_axis_value
+                # forward/backwards controlls - bound to triggers
+                print(axis)
+                if(axis == 'hat0x'):
+                    print("val: " + str(cur_axis_value))
                 if axis == 'right':
                     if right_down == False and axis_states['right'] > -1:
                         right_down = True
@@ -209,22 +238,50 @@ while True:
                         motor1.full_stop()
                         motor2.full_stop()
                         print("left stopped")
-                if axis == 'z' or 'rz':
-                    if stick_right_active == False and check_right_stick():
+                # individual wheels - bound to joysticks
+                if axis == 'hat0x':
+                    if check_right_stick(): #stick_right_active == False and:
                         stick_right_active = True
                         _thread.start_new_thread(right_stick_monitor, ())
                         motor1.forward()
-                    elif stick_right_active == True and False == check_right_stick():
-                        stick_right_active = False
-                        motor1.full_stop()
-                        print("right stopped")
-                if axis == 'x' or axis == 'y':
-                    if stick_left_active == False and check_left_stick():
+                        motor2.backwards()
+                    elif check_left_stick(): #stick_left_active == False and 
                         stick_left_active = True
                         _thread.start_new_thread(left_stick_monitor, ())
                         motor2.forward()
-                    elif stick_left_active == True and False == check_left_stick():
+                        motor1.backwards()
+                    elif False == check_right_stick(): #stick_right_active == True and 
+                        stick_right_active = False
+                        motor1.full_stop()
+                        motor2.full_stop()
+                        print("right stopped")
+                    elif False == check_left_stick(): #stick_left_active == True and 
                         stick_left_active = False
                         motor2.full_stop()
+                        motor1.full_stop()
                         print("left stopped")
-
+                    
+                    
+                    """   
+                        if stick_right_active == False and check_right_stick():
+                            stick_right_active = True
+                            _thread.start_new_thread(right_stick_monitor, ())
+                            motor1.forward()
+                            motor2.backwards()
+                        elif stick_right_active == True and False == check_right_stick():
+                            stick_right_active = False
+                            motor1.full_stop()
+                            motor2.full_stop()
+                            print("right stopped")
+                    if axis == 'x' or axis == 'y':
+                        if stick_left_active == False and check_left_stick():
+                            stick_left_active = True
+                            _thread.start_new_thread(left_stick_monitor, ())
+                            motor2.forward()
+                            motor1.backwards()
+                        elif stick_left_active == True and False == check_left_stick():
+                            stick_left_active = False
+                            motor2.full_stop()
+                            motor1.full_stop()
+                            print("left stopped")
+                        """

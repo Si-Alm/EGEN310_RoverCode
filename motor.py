@@ -27,18 +27,18 @@ class Motor:
         self.pwm.ChangeDutyCycle(0)
 
 
-    def full_stop():
-        GPIO.output(in_low, GPIO.LOW)
-        GPIO.output(in_high, GPIO.LOW)
-        pwm.ChangeDutyCycle(LOW_VALUE)
+    def full_stop(self):
+        GPIO.output(self.in_low, GPIO.LOW)
+        GPIO.output(self.in_high, GPIO.LOW)
+        self.pwm.ChangeDutyCycle(self.LOW_VALUE)
 
-    def forward():
-        GPIO.output(in_low, GPIO.HIGH)
-        GPIO.output(in_high, GPIO.LOW)
-        pwm.ChangeDutyCycle(HIGH_VALUE)
+    def forward(self):
+        GPIO.output(self.in_low, GPIO.HIGH)
+        GPIO.output(self.in_high, GPIO.LOW)
+        self.pwm.ChangeDutyCycle(self.HIGH_VALUE)
 
-    def backwards():
-        GPIO.output(in_low, GPIO.LOW)
-        GPIO.output(in_high, GPIO.HIGH)
-        pwm.ChangeDutyCycle(HIGH_VALUE)
+    def backwards(self):
+        GPIO.output(self.in_low, GPIO.LOW)
+        GPIO.output(self.in_high, GPIO.HIGH)
+        self.pwm.ChangeDutyCycle(self.HIGH_VALUE)
 
