@@ -130,6 +130,7 @@ button_names = {
 axis_map = []
 button_map = []
 
+# joystick driver mappings courtesy of @rdb on github - https://gist.github.com/rdb/8864666
 # Open the joystick device.
 fn = '/dev/input/js0'
 jsdev = open(fn, 'rb')
