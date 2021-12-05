@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 
 class Motor:
-    HIGH_VALUE = 75
+    HIGH_VALUE = 85
     MED_VALUE = 50
     LOW_VALUE = 0
     def __init__(self, name, pin_mode, en, in_low, in_high):
