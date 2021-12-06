@@ -23,8 +23,7 @@ class Motor:
         GPIO.output(in_high, GPIO.LOW)
 
         self.pwm = GPIO.PWM(en, 100)
-        self.pwm.start(25)
-        self.pwm.ChangeDutyCycle(0)
+        self.pwm.start(0)
 
 
     def full_stop(self):
