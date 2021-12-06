@@ -33,15 +33,15 @@ def left_monitor():
             motor2.backwards()
         print("backwards")
 
+# will exit when right turn control disengages
 def right_stick_monitor():
     while check_right_stick():
-        five = 0
-        #print("right wheel")
+        continue
 
+# will exit when left turn control disengages
 def left_stick_monitor():
     while check_left_stick():
-        five = 0
-        #print("left wheel")
+        continue
 
 def check_right_stick():
     return(axis_states['hat0x'] > 0.05)
